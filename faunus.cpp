@@ -49,12 +49,15 @@ int main(int argc, char** argv) {
       getDefaultParsingOptions()
    );
 
+   CXCursor unitCursor = clang_getTranslationUnitCursor(unitResult);
+
    if(isDebugBuild()) {
       std::cout << "got unitResult @" << unitResult << std::endl;
    }
 
    /* TODO: traverse like a boss */
 
+   clang_disposeTranslationUnit(unitResult);
    clang_disposeIndex(testIndex);
    return EXIT_SUCCESS;
 }
