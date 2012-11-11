@@ -1,1 +1,3 @@
 FAUNUS
+
+A configurable C++ source code formatter build on libclang.
