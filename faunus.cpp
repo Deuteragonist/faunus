@@ -4,7 +4,7 @@
 
 #include <clang-c/Index.h>
 
-const char* clangOpts[] = {"-x", "c++"};
+const char* clangOpts[] = {"-x", "c++", "-cc1", "-ast-print"};
 
 static const bool isDebugBuild(); 
 static unsigned getDefaultParsingOptions();
@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
    CXTranslationUnit unitResult = clang_parseTranslationUnit( testIndex,
       argv[1],
       (const char *const *) clangOpts,
-      2,
+      4,
       0,
       0,
       getDefaultParsingOptions()
@@ -67,7 +67,18 @@ static unsigned getDefaultParsingOptions() {
 }
 
 enum CXChildVisitResult ASTWalker(CXCursor cursor, CXCursor parent, CXClientData client_data) {
-   std::cout << cursor.kind << " " << cursor.data << " " << cursor.data << std::endl;
+   CXString cursorDisplayName = clang_getCursorDisplayName(cursor);
+   CXString cursorSpelling = clang_getCursorSpelling(cursor);
+
+   /* review http://clang.llvm.org/doxygen/group__CINDEX.html#gaaccc432245b4cd9f2d470913f9ef0013 */
+
+   std::cout 
+      << clang_getCString(cursorDisplayName) << " "
+      << clang_getCString(cursorSpelling) << std::endl
+      << cursor.kind << " " << cursor.data << " " << cursor.data << std::endl;
+
+   clang_disposeString(cursorSpelling);
+   clang_disposeString(cursorDisplayName);
 
    return CXChildVisit_Recurse;
 }
