@@ -26,5 +26,3 @@ $(OUT): $(OBJS)
 clean:
 	rm -f $(OBJS) $(OUT)
 
-
-

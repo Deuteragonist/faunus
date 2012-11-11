@@ -67,7 +67,7 @@ static unsigned getDefaultParsingOptions() {
 }
 
 enum CXChildVisitResult ASTWalker(CXCursor cursor, CXCursor parent, CXClientData client_data) {
-
+   std::cout << cursor.kind << " " << cursor.data << " " << cursor.data << std::endl;
 
    return CXChildVisit_Recurse;
 }
