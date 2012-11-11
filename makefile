@@ -1,10 +1,16 @@
 CC=gcc
-CLANG_INSTALL_DIR=/gpfs/home/tbs5065/local
-CLANG_INCLUDE_DIR=$(CLANG_INSTALL_DIR)/include
-CLANG_LIB_DIR=$(CLANG_INSTALL_DIR)/lib
 
-CXXFLAGS=-I $(CLANG_INCLUDE_DIR) -c -g
-LDFLAGS=-lstdc++ -lm -L $(CLANG_LIB_DIR) -lclang
+CXXFLAGS=$(shell llvm-config --cxxflags) -c -g
+LDFLAGS=-lstdc++ -lm\
+ -lclang -lclangAnalysis -lclangARCMigrate -lclangAST\
+ -lclangASTMatchers -lclangBasic -lclangCodeGen\
+ -lclangDriver -lclangEdit -lclangFrontend -lclangFrontendTool\
+ -lclangLex -lclangParse -lclangRewriteCore\
+ -lclangRewriteFrontend -lclangSema -lclangSerialization\
+ -lclangStaticAnalyzerCheckers -lclangStaticAnalyzerCore\
+ -lclangStaticAnalyzerFrontend -lclangTooling\
+ $(shell llvm-config --ldflags)\
+ $(shell llvm-config --libs)
 
 OBJS=faunus.o
 OUT=faunus
@@ -19,3 +25,6 @@ $(OUT): $(OBJS)
 
 clean:
 	rm -f $(OBJS) $(OUT)
+
+
+

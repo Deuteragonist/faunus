@@ -1,7 +1,11 @@
 #include <iostream>
 #include <cstring>
-#include <clang-c/Index.h>
 #include <cassert>
+
+#include <clang/Basic/FileSystemOptions.h>
+#include <clang/Basic/SourceManager.h>
+
+using namespace clang;
 
 const inline bool isDebugBuild() { 
    #ifndef NDEBUG
@@ -17,23 +21,13 @@ int main(int argc, char** argv) {
       return EXIT_FAILURE;
    }
 
+   FileSystemOptions fsOpts;
+   FileManager fm(fsOpts);
+   //DiagnosticsEngine de;
+   //SourceManager sm;
+
    if(isDebugBuild()) {
       std::cout << "attempting to open <" << argv[1] << "> ..." << std::endl;
-   }
-
-   CXIndex index = 0;
-   CXIndexAction indexAction = clang_IndexAction_create(index);
-   CXTranslationUnit thisUnit = clang_createTranslationUnitFromSourceFile(
-      index,
-      (const char*) argv[1],
-      0,
-      NULL,
-      0,
-      NULL 
-   );  
-
-   if(isDebugBuild()) {
-      std::cout << "created translation unit @" << thisUnit << std::endl;
    }
 
    return EXIT_SUCCESS;
