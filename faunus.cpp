@@ -2,17 +2,30 @@
 #include <cstring>
 #include <cassert>
 
-#include <clang/Basic/FileSystemOptions.h>
-#include <clang/Basic/SourceManager.h>
+#include <clang-c/Index.h>
 
-using namespace clang;
+const char* clangOpts[] = {"-x", "c++"};
 
-const inline bool isDebugBuild() { 
+static const inline bool isDebugBuild() { 
    #ifndef NDEBUG
       return true;
    #else
       return false;
    #endif
+}
+
+static unsigned getDefaultParsingOptions() {
+   unsigned options = CXTranslationUnit_DetailedPreprocessingRecord;
+
+   if (getenv("CINDEXTEST_EDITING")) {
+      options |= clang_defaultEditingTranslationUnitOptions();
+   }
+
+   if (getenv("CINDEXTEST_COMPLETION_CACHING")) {
+      options |= CXTranslationUnit_CacheCompletionResults;
+   }
+  
+  return options;
 }
 
 int main(int argc, char** argv) {
@@ -21,14 +34,27 @@ int main(int argc, char** argv) {
       return EXIT_FAILURE;
    }
 
-   FileSystemOptions fsOpts;
-   FileManager fm(fsOpts);
-   //DiagnosticsEngine de;
-   //SourceManager sm;
+   CXIndex testIndex = clang_createIndex(1, 1);
 
    if(isDebugBuild()) {
       std::cout << "attempting to open <" << argv[1] << "> ..." << std::endl;
    }
 
+   CXTranslationUnit unitResult = clang_parseTranslationUnit( testIndex,
+      argv[1],
+      (const char *const *) clangOpts,
+      2,
+      0,
+      0,
+      getDefaultParsingOptions()
+   );
+
+   if(isDebugBuild()) {
+      std::cout << "got unitResult @" << unitResult << std::endl;
+   }
+
+   /* TODO: traverse like a boss */
+
+   clang_disposeIndex(testIndex);
    return EXIT_SUCCESS;
 }
