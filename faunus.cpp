@@ -6,27 +6,9 @@
 
 const char* clangOpts[] = {"-x", "c++"};
 
-static const inline bool isDebugBuild() { 
-   #ifndef NDEBUG
-      return true;
-   #else
-      return false;
-   #endif
-}
-
-static unsigned getDefaultParsingOptions() {
-   unsigned options = CXTranslationUnit_DetailedPreprocessingRecord;
-
-   if (getenv("CINDEXTEST_EDITING")) {
-      options |= clang_defaultEditingTranslationUnitOptions();
-   }
-
-   if (getenv("CINDEXTEST_COMPLETION_CACHING")) {
-      options |= CXTranslationUnit_CacheCompletionResults;
-   }
-  
-  return options;
-}
+static const bool isDebugBuild(); 
+static unsigned getDefaultParsingOptions();
+enum CXChildVisitResult ASTWalker(CXCursor cursor, CXCursor parent, CXClientData client_data);
 
 int main(int argc, char** argv) {
    if( argc != 2 ) {
@@ -55,9 +37,39 @@ int main(int argc, char** argv) {
       std::cout << "got unitResult @" << unitResult << std::endl;
    }
 
-   /* TODO: traverse like a boss */
+   clang_visitChildren( unitCursor, ASTWalker, NULL);
 
    clang_disposeTranslationUnit(unitResult);
    clang_disposeIndex(testIndex);
    return EXIT_SUCCESS;
 }
+
+static const bool isDebugBuild() { 
+   #ifndef NDEBUG
+      return true;
+   #else
+      return false;
+   #endif
+}
+
+static unsigned getDefaultParsingOptions() {
+   unsigned options = CXTranslationUnit_DetailedPreprocessingRecord;
+
+   if (getenv("CINDEXTEST_EDITING")) {
+      options |= clang_defaultEditingTranslationUnitOptions();
+   }
+
+   if (getenv("CINDEXTEST_COMPLETION_CACHING")) {
+      options |= CXTranslationUnit_CacheCompletionResults;
+   }
+  
+  return options;
+}
+
+enum CXChildVisitResult ASTWalker(CXCursor cursor, CXCursor parent, CXClientData client_data) {
+
+
+   return CXChildVisit_Recurse;
+}
+
+
