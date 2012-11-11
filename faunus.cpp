@@ -4,7 +4,7 @@
 
 #include <clang-c/Index.h>
 
-const char* clangOpts[] = {"-x", "c++", "-cc1", "-ast-print"};
+const char* clangOpts[] = {"-x", "c++", NULL};
 
 static const bool isDebugBuild(); 
 static unsigned getDefaultParsingOptions();
@@ -16,6 +16,9 @@ int main(int argc, char** argv) {
       return EXIT_FAILURE;
    }
 
+   int clangOptsCount = 0;
+   while(clangOpts[++clangOptsCount]);
+
    CXIndex testIndex = clang_createIndex(1, 1);
 
    if(isDebugBuild()) {
@@ -25,7 +28,7 @@ int main(int argc, char** argv) {
    CXTranslationUnit unitResult = clang_parseTranslationUnit( testIndex,
       argv[1],
       (const char *const *) clangOpts,
-      4,
+      clangOptsCount,
       0,
       0,
       getDefaultParsingOptions()
@@ -82,5 +85,4 @@ enum CXChildVisitResult ASTWalker(CXCursor cursor, CXCursor parent, CXClientData
 
    return CXChildVisit_Recurse;
 }
-
 
